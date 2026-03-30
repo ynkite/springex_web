@@ -1,6 +1,7 @@
 package com.example.springex_web.controller;
 
 
+import com.example.springex_web.dto.PageRequestDTO;
 import com.example.springex_web.dto.TodoDTO;
 import com.example.springex_web.service.TodoService;
 import jakarta.validation.Valid;
@@ -18,13 +19,22 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class TodoController {
     private final TodoService todoService;
-    @RequestMapping("/list")
-    public void list(Model model){
-        log.info("todo list........");
-        model.addAttribute("dtoList", todoService.getAll());
+//    @RequestMapping("/list")
+//    public void list(Model model){
+//        log.info("todo list........");
+//        model.addAttribute("dtoList", todoService.getAll());
+//    }
+    //    @RequestMapping(value ="/register", method= RequestMethod.GET) //GETMAPPING
+
+    @GetMapping("/list")
+    public void list(@Valid PageRequestDTO pageRequestDTO, BindingResult bindingResult, Model model){
+        log.info(pageRequestDTO);
+        if(bindingResult.hasErrors()){
+            pageRequestDTO = PageRequestDTO.builder().build();
+        }
+        model.addAttribute("responseDTO", todoService.getList(pageRequestDTO));
     }
 
-    //    @RequestMapping(value ="/register", method= RequestMethod.GET) //GETMAPPING
     @GetMapping("/register")
     public void register() {
         log.info("todo register........");

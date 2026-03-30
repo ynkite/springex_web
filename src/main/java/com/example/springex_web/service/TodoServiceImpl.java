@@ -2,6 +2,8 @@ package com.example.springex_web.service;
 
 
 import com.example.springex_web.domain.TodoVO;
+import com.example.springex_web.dto.PageRequestDTO;
+import com.example.springex_web.dto.PageResponseDTO;
 import com.example.springex_web.dto.TodoDTO;
 import com.example.springex_web.mapper.TodoMapper;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Log4j2
@@ -26,13 +29,31 @@ public class TodoServiceImpl implements TodoService{
         log.info(todoVO);
         todoMapper.insert(todoVO);
     }
+//    @Override
+//    public List<TodoDTO> getAll() {
+//        List<TodoDTO> dtoList = todoMapper.selectAll().stream()
+//                .map(vo -> modelMapper.map(vo, TodoDTO.class))
+//                .collect(Collectors.toList());
+//        return dtoList;
+//    }
+
     @Override
-    public List<TodoDTO> getAll() {
-        List<TodoDTO> dtoList = todoMapper.selectAll().stream()
+    public PageResponseDTO<TodoDTO> getList(PageRequestDTO pageRequestDTO) {
+        List<TodoVO> voList = todoMapper.selectList(pageRequestDTO);
+
+        List<TodoDTO> dtoList = voList.stream()
                 .map(vo -> modelMapper.map(vo, TodoDTO.class))
                 .collect(Collectors.toList());
-        return dtoList;
+        int total = todoMapper.getCount(pageRequestDTO);
+
+        PageResponseDTO<TodoDTO> pageResponseDTO = PageResponseDTO.<TodoDTO>withAll()
+                .dtoList(dtoList)
+                .total(total)
+                .pageRequestDTO(pageRequestDTO)
+                .build();
+        return pageResponseDTO;
     }
+
     @Override
     public TodoDTO getOne(Long tno) {
         TodoVO todoVO = todoMapper.selectOne(tno);
@@ -50,4 +71,5 @@ public class TodoServiceImpl implements TodoService{
         TodoVO todoVO = modelMapper.map(todoDTO, TodoVO.class);
                 todoMapper.update(todoVO);
     }
+
 }
