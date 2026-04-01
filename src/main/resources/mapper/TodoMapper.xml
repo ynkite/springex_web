@@ -3,9 +3,38 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.springex_web.mapper.TodoMapper">
+
+    <sql id="search">
+        <where>
+            <if test="types != null and types.length > 0">
+                <foreach collection="types" item="type" open="(" close=") "
+                         separator=" OR ">
+                    <if test="type == 't'.toString()">
+                        title like concat('%', #{keyword}, '%')
+                    </if>
+                    <if test="type == 'w'.toString()">
+                        writer like concat('%', #{keyword}, '%')
+                    </if>
+                </foreach>
+            </if>
+            <if test="finished">
+                <trim prefix="and">
+                    finished = 1
+                </trim>
+            </if>
+
+            <if test="from != null and to != null">
+                <trim prefix="and">
+                    dueDate between #{from} and #{to}
+                </trim>
+            </if>
+        </where>
+    </sql>
     <select id="getTime" resultType="string">
         SELECT now()
     </select>
+
+
 
     <insert id="insert">
         insert into tbl_todo(title, dueDate, writer) values (#{title}, #{dueDate}, #{writer})
@@ -28,10 +57,29 @@
     </update>
 
     <select id="selectList" resultType="com.example.springex_web.domain.TodoVO">
-        select * from tbl_todo order by tno desc limit #{skip},${size}
+
+        select * from tbl_todo
+        <include refid="search"></include>
+        order by tno desc limit #{skip}, #{size}
     </select>
 
+    <!--
+    전체 Todo 개수를 조회하는 쿼리
+    - tbl_todo 테이블에 저장된 행(row) 수를 구함
+    - count(tno)는 tno 컬럼 값의 개수를 셈
+    - 보통 페이지네이션에서 전체 데이터 수를 구할 때 사용
+-->
     <select id="getCount" resultType="int">
+
+        <!--
+            tno 개수를 세어서 반환
+            예: 데이터가 500개 있으면 500 반환
+        -->
         select count(tno) from tbl_todo
+        <include refid="search"></include>
+
     </select>
+
+
+
 </mapper>

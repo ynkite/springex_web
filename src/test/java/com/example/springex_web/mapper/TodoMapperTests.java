@@ -55,4 +55,22 @@ public class TodoMapperTests {
         List<TodoVO> voList = todoMapper.selectList(pageRequestDTO);
         voList.forEach(vo -> log.info(vo));
     }
+
+    @Test
+    public void testSelectSearch(){
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+                .page(1)
+                .size(10)
+                .types(new String[]{"t","m"})
+                .keyword("에러")
+                .finished(true)
+                .from(LocalDate.of(2026,05,01))
+                .to(LocalDate.of(2026,05,31))
+                .build();
+
+        log.info(todoMapper.getCount(pageRequestDTO));
+        List<TodoVO> voList = todoMapper.selectList(pageRequestDTO);
+        voList.forEach(vo -> log.info(vo));
+
+    }
 }

@@ -86,13 +86,15 @@
               </div>
             </div>
             <script>
-                document.querySelector(".btn-primary").addEventListener("click", function (e) {
-                  self.location="/todo/modify?tno="+${dto.tno}
-                }, false)
+              document.querySelector(".btn-primary").addEventListener("click", function (e) {
+                <%--self.location="/todo/modify?tno="+${dto.tno}--%>
+                self.location=`/todo/modify?tno=${dto.tno}&${pageRequestDTO.link}`
+              }, false)
 
-                document.querySelector(".btn-secondary").addEventListener("click", function (e) {
-                  self.location="/todo/list"
-                }, false)
+              document.querySelector(".btn-secondary").addEventListener("click", function (e) {
+                // self.location="/todo/list"
+                self.location="/todo/list?${pageRequestDTO.link}"
+              }, false)
             </script>
 
 
